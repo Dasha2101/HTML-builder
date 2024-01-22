@@ -10,6 +10,3 @@ stream.on('readable', function(){
   console.log(data);
 });
 
-// stream.on('end', function(){
-//   console.log('the end')
-// })
