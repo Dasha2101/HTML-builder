@@ -51,7 +51,12 @@ async function mergeCSS(){
 }
 
 async function addAssets(mainPath, importPath){
-  await fs.mkdir(importPath);
+  const checkDir = await fs.stat(importPath).catch(() => null)
+
+  if (!checkDir || !checkDir.isDirectory()){
+    await fs.mkdir(importPath, {recursive: true});
+  }
+
   const files =  await fs.readdir(mainPath);
 
   await Promise.all(files.map(async (file) =>{
@@ -60,9 +65,13 @@ async function addAssets(mainPath, importPath){
     const stats = await fs.stat(startPath);
 
     if (stats.isFile()){
-      const data = await fs.readFile(startPath, 'utf8');
-      await fs.writeFile(endPath, data, 'utf8');
 
+      const checkFile = await fs.stat(endPath).catch(() => null)
+
+      if (!checkFile || !checkFile.isFile()){
+        const data = await fs.readFile(startPath, 'binary');
+        await fs.writeFile(endPath, data, 'binary');
+      }
     } else if (stats.isDirectory()) {
       await addAssets(startPath, endPath);
     }
